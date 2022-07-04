@@ -2,15 +2,37 @@ import React from 'react';
 import Lottie from 'lottie-react';
 import chatLottie from '../../../lottie/chat.json';
 import { useForm } from 'react-hook-form';
-import {Link} from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
+import auth from '../../../firebase.init'
+import { useCreateUserWithEmailAndPassword, useUpdateProfile } from 'react-firebase-hooks/auth';
 
 const SignUp = () => {
+    // lottie style
     const style = {
         height: 300,
     };
 
+    // navigator
+    const navigate = useNavigate();
+
+    // react firebase hook
+    const [
+        createUserWithEmailAndPassword,
+        user,
+        loading,
+        error,
+      ] = useCreateUserWithEmailAndPassword(auth);
+
+    const [updateProfile] = useUpdateProfile(auth);
+
+    // react form hook
     const { register, handleSubmit } = useForm();
-    const onSubmit = (data) => console.log(data);
+
+    // create new account
+    const onSubmit = async ({name, email, password}) => {
+        await createUserWithEmailAndPassword(email, password)
+        await updateProfile({displayName: name})
+    };
 
     return (
         <section className="bg-[#13121d] h-screen">
@@ -18,7 +40,7 @@ const SignUp = () => {
                 <Lottie animationData={chatLottie} loop={true} style={style} />
 
                 <div className="w-96 bg-[#1e1d29] p-8 rounded-lg">
-                    <h2 className='text-3xl font-bold mb-8'>Create ChatX</h2>
+                    <h2 className="text-3xl font-bold mb-8">Create ChatX</h2>
 
                     <form
                         className="flex flex-col"
@@ -27,7 +49,7 @@ const SignUp = () => {
                         <input
                             type="text"
                             placeholder="Your Name"
-                            class="input bg-[#13121d] w-full mb-3"
+                            className="input bg-[#13121d] w-full mb-3"
                             {...register('name', {
                                 required: true,
                             })}
@@ -35,7 +57,7 @@ const SignUp = () => {
                         <input
                             type="email"
                             placeholder="Your Email"
-                            class="input bg-[#13121d] w-full mb-3"
+                            className="input bg-[#13121d] w-full mb-3"
                             {...register('email', {
                                 required: true,
                             })}
@@ -43,15 +65,21 @@ const SignUp = () => {
                         <input
                             type="password"
                             placeholder="Password"
-                            class="input bg-[#13121d] w-full mb-3"
+                            className="input bg-[#13121d] w-full mb-3"
                             {...register('password', {
                                 required: true,
                             })}
                         />
-                        <input class="btn btn-primary text-white" type="submit" value="Create Account" />
+                        <input
+                            className="btn btn-primary text-white"
+                            type="submit"
+                            value="Create Account"
+                        />
 
-                        <div class="divider">OR</div>
-                        <button class="btn">Already Have An Account</button>
+                        <div className="divider">OR</div>
+                        <button className="btn" onClick={() => navigate('/login')}>
+                            Already Have An Account
+                        </button>
                     </form>
                 </div>
             </div>
